@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CLARA — Cleaning Live Air Recycling Automation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4Cfaq7iRKTcE5I6b15pGj/t9aQ/Sj7qD+9j4fQ1v2D8H6/k5V/z8m0b5o5i5F1/g6L/yQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* BASE DARK MODE THEME */
+        :root {
+            --color-primary: #1e3a8a;
+            --color-secondary: #059669;
+            --color-accent: #34d399;
+            --color-bg: #030712;
+            --color-text-main: #d1d5db;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text-main);
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* BACKGROUND PATTERN (DARK) */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2334d399' fill-opacity='0.1'%3E%3Cpath d='M36 34.545V43.5c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2v-8.955H20c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h8.955V20c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v8.955H43.5c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-8.955zM12 20c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-4zM48 44c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-4zM12 48c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-4zM48 12c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-4zM22 2c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2V2zM22 52c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2v-4zM52 22c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2v-4zM2 22c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2v-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            z-index: -1;
+        }
+
+        .cyber-card {
+            background-color: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8), 0 0 25px rgba(52,211,153,0.2);
+            transition: all 0.3s;
+        }
+
+        .cyber-btn {
+            background-image: linear-gradient(to right, #059669 0%, #34d399 51%, #059669 100%);
+            transition: all 0.4s ease;
+            background-size: 200% auto;
+            border: 1px solid var(--color-accent);
+        }
+        .cyber-btn:hover { background-position: right center; box-shadow: 0 0 10px var(--color-accent); transform: translateY(-2px); }
+
+        .cyber-input {
+            background-color: #1f2937; border: 1px solid #374151; color: #e5e7eb; transition: all 0.3s;
+        }
+        .cyber-input:focus { border-color: #34d399; box-shadow: 0 0 0 2px rgba(52,211,153,0.5); outline:none; }
+
+        .tech-mono { font-family: 'Share Tech Mono', monospace; color: var(--color-accent); }
+
+        .active-nav {
+            background-color: #34d399 !important;
+            color: #030712 !important;
+            font-weight: 700 !important;
+            box-shadow: 0 0 15px #34d399, 0 0 5px #059669;
+        }
+        
+        .typing-effect::after { content: '▋'; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        #recyclingCanvas { border: 2px solid #34d399; background-color: #0d131f; box-shadow: 0 0 10px rgba(52,211,153,0.5); cursor:pointer; }
+        #musicToggle { position: fixed; right: 18px; top: 18px; z-index: 60; background: rgba(3,7,18,0.7); border:1px solid rgba(52,211,153,0.2); color:#d1d5db; padding:8px 10px; border-radius:999px; font-size:14px; backdrop-filter: blur(6px); transition: all 0.3s; }
+        #musicToggle.active { box-shadow: 0 0 12px #34d399; color:#030712; background:#34d399; }
+
+        /* --- LIGHT MODE STYLES --- */
+        .light-mode {
+            --color-primary: #1d4ed8;
+            --color-secondary: #047857;
+            --color-accent: #10b981;
+            --color-bg: #f9fafb; /* Light Background */
+            --color-text-main: #1f2937; /* Dark text */
+            color: var(--color-text-main);
+        }
+
+        .light-mode body::before {
+            opacity: 0.1;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2310b981' fill-opacity='0.1'%3E%3Cpath d='M36 34.545V43.5c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2v-8.955H20c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h8.955V20c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v8.955H43.5c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-8.955zM12 20c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-4zM48 44c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-4zM12 48c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-4zM48 12c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-4zM22 2c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2V2zM22 52c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2v-4zM52 22c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2v-4zM2 22c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2v-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .light-mode header,
+        .light-mode nav {
+            background-color: #ffffff;
+            border-color: #d1d5db;
+        }
+
+        .light-mode header h1 {
+            color: #1f2937; /* Darker header text */
+        }
+
+        .light-mode header p {
+            color: #4b5563;
+        }
+
+        .light-mode .nav-btn {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+
+        .light-mode .nav-btn:hover {
+            background-color: #d1fae5;
+        }
+
+        .light-mode .cyber-card {
+            background-color: #ffffff;
+            backdrop-filter: none;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1), 0 0 15px rgba(16, 185, 129, 0.3);
+            color: #1f2937;
+        }
+
+        .light-mode .tech-mono {
+            color: var(--color-secondary) !important; /* Important to override game styles */
+        }
+
+        .light-mode .cyber-input {
+            background-color: #e5e7eb; 
+            border: 1px solid #9ca3af; 
+            color: #1f2937;
+        }
+        .light-mode .cyber-input:focus { border-color: #10b981; box-shadow: 0 0 0 2px rgba(16,185,129,0.5); }
+
+        .light-mode .bg-gray-800\/50,
+        .light-mode .bg-gray-900\/50 {
+            background-color: #f3f4f6;
+            border-color: #d1d5db;
+            color: #1f2937;
+        }
+
+        .light-mode .bg-green-600\/80 {
+            background-color: #10b981;
+            color: #fff;
+        }
+
+        .light-mode .bg-gray-700\/80 {
+            background-color: #9ca3af;
+            color: #fff;
+        }
+        
+        /* NEW LIGHT MODE STYLES FOR GAMES */
+        .light-mode #flappyGame {
+            background-color: #e0f2fe !important; /* Light background */
+            border-color: #047857 !important;
+        }
+        .light-mode #bot {
+            background-color: #1f2937 !important; /* Dark bot */
+            color: #fff !important;
+            border-color: #f9fafb !important;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .light-mode .vine {
+            background-color: #047857 !important; /* Darker vines */
+            border-color: #059669 !important;
+            box-shadow: 0 0 10px rgba(4,120,87,0.5);
+        }
+        .light-mode #recyclingCanvas {
+            background-color: #e5e7eb !important; /* Light canvas */
+            border-color: #10b981;
+        }
+        .light-mode #recyclingCanvas + .flex p {
+            color: #1f2937 !important; /* Dark text for score/lives container */
+        }
+        .light-mode #recyclingCanvas + .flex #recyclingLivesDisplay {
+            color: #b91c1c !important; /* Dark red for lives */
+        }
+        /* END NEW GAME STYLES */
+
+        .light-mode #musicToggle {
+            background: rgba(255,255,255,0.8);
+            color: #1f2937;
+            border:1px solid rgba(0,0,0,0.1);
+        }
+        .light-mode #musicToggle.active { 
+            box-shadow: 0 0 12px #10b981; 
+            color:#fff; 
+            background:#10b981; 
+        }
+        
+        .light-mode .bg-blue-900\/20 {
+            background-color: #e0f2fe;
+            border-color: #bfdbfe;
+        }
+        .light-mode .bg-blue-900\/20 p {
+             color: #1f2937;
+        }
+        
+        .light-mode .text-gray-400 {
+            color: #6b7280;
+        }
+        
+        /* PROFILE PICTURE STYLES */
+        .profile-pic-lg {
+            font-size: 80px;
+            width: 120px;
+            height: 120px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(52, 211, 153, 0.2);
+            border: 3px solid #34d399;
+            box-shadow: 0 0 15px rgba(52, 211, 153, 0.5);
+        }
+        .profile-pic-sm {
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .profile-pic-sm:hover {
+            border-color: #34d399;
+        }
+        .profile-pic-sm.selected {
+            border-color: #34d399;
+            box-shadow: 0 0 10px #34d399;
+            transform: scale(1.1);
+        }
+
+        .light-mode .profile-pic-lg {
+            background-color: rgba(16, 185, 129, 0.2);
+            border: 3px solid #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+        .light-mode .profile-pic-sm.selected {
+            border-color: #10b981;
+            box-shadow: 0 0 10px #10b981;
+        }
+    </style>
+</head>
+<body class="p-0 md:p-8">
+
+    <header class="text-center py-6 px-4 bg-gray-900 shadow-xl border-b border-gray-700 md:rounded-t-xl">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-wider drop-shadow-lg">
+            CLARA — Cleaning Live Air Recycling Automation 
+            <span class="text-green-400">🤖🌿</span>
+        </h1>
+        <p class="text-sm text-gray-400 mt-1">Merging Nature and Technology for a Cleaner Tomorrow</p>
+    </header>
+
+    <button id="musicToggle" title="Toggle background music"><i class="fas fa-music"></i></button>
+
+    <nav class="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-sm shadow-2xl p-3 md:p-4 border-b border-green-500/50 flex flex-wrap justify-center space-x-1 md:space-x-4 md:rounded-b-xl">
+        <button id="nav-home" onclick="show('home')" class="nav-btn bg-gray-700 hover:bg-green-500/20 text-white font-medium py-2 px-4 rounded-full transition-colors active-nav">Home</button>
+        <button id="nav-profile" onclick="show('profile')" class="nav-btn bg-gray-700 hover:bg-green-500/20 text-white font-medium py-2 px-4 rounded-full transition-colors">Profile</button>
+        <button id="nav-login" onclick="show('login')" class="nav-btn bg-gray-700 hover:bg-green-500/20 text-white font-medium py-2 px-4 rounded-full transition-colors">Auth</button>
+        <button id="nav-leaderboard" onclick="show('leaderboard')" class="nav-btn bg-gray-700 hover:bg-green-500/20 text-white font-medium py-2 px-4 rounded-full transition-colors">Leaderboard</button>
+        <button id="nav-map" onclick="show('map')" class="nav-btn bg-gray-700 hover:bg-green-500/20 text-white font-medium py-2 px-4 rounded-full transition-colors">Pollution Map</button>
+        <button id="nav-chat" onclick="show('chat')" class="nav-btn bg-gray-700 hover:bg-green-500/20 text-white font-medium py-2 px-4 rounded-full transition-colors hidden sm:inline-block">Community</button>
+        <button id="nav-ecoAI" onclick="show('ecoAI')" class="nav-btn bg-gray-700 hover:bg-green-500/20 text-white font-medium py-2 px-4 rounded-full transition-colors hidden sm:inline-block">Eco AI</button>
+        <button id="nav-settings" onclick="show('settings')" class="nav-btn bg-gray-700 hover:bg-green-500/20 text-white font-medium py-2 px-4 rounded-full transition-colors">Settings</button>
+        <button id="nav-games" onclick="show('games')" class="nav-btn bg-gray-700 hover:bg-green-500/20 text-white font-medium py-2 px-4 rounded-full transition-colors">Games</button>
+    </nav>
+
+    <main class="p-4 md:p-8">
+        <section id="home" class="active">
+            <div class="cyber-card p-6 md:p-10 rounded-xl max-w-4xl mx-auto border-green-400/50">
+                <h2 class="text-4xl font-black text-green-400 mb-4 drop-shadow-md">CLARA Operational Dashboard</h2>
+                <p class="text-lg text-gray-300 mb-6">CLARA (Cleaning Live Air Recycling Automation) is a smart eco-robotic system that uses AI-powered drones to detect pollution hotspots and deploy automated dustbins to purify the air and recycle waste. Every action earns you points, empowering our community for a cleaner tomorrow.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 mt-6 border-t border-gray-700">
+                    <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-green-500">
+                        <p class="text-sm text-gray-400">Total Users</p>
+                        <p class="tech-mono text-2xl font-bold">1,402</p>
+                    </div>
+                    <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-yellow-500">
+                        <p class="text-sm text-gray-400">Total Points Awarded</p>
+                        <p class="tech-mono text-2xl font-bold">12,500</p>
+                    </div>
+                    <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-cyan-500">
+                        <p class="text-sm text-gray-400">Missions Completed</p>
+                        <p class="tech-mono text-2xl font-bold">347</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cyber-card p-6 md:p-10 rounded-xl max-w-4xl mx-auto border-cyan-400/50 mt-8">
+                <h3 class="text-3xl font-bold text-cyan-400 mb-4 drop-shadow-md">Trivandrum Regional Status 📡</h3>
+                <p class="text-gray-300 mb-6">Real-time environmental data for the Trivandrum operational zone.</p>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-red-500">
+                        <p class="text-sm text-gray-400">Air Quality Index (AQI)</p>
+                        <p class="tech-mono text-2xl font-bold">124 (Unhealthy)</p>
+                    </div>
+                    <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-yellow-500">
+                        <p class="text-sm text-gray-400">Active CLARA Units</p>
+                        <p class="tech-mono text-xl font-bold">1 Drone / 1 Bin</p>
+                    </div>
+                    <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-green-500">
+                        <p class="text-sm text-gray-400">Last Report Time</p>
+                        <p class="tech-mono text-xl font-bold">14:00:21 IST</p>
+                    </div>
+                    <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-blue-500">
+                        <p class="text-sm text-gray-400">Current Location</p>
+                        <p id="trivandrumLocation" class="tech-mono text-xl font-bold">PATTOM JUNCTION</p>
+                    </div>
+                    </div>
+                <p class="tech-mono mt-4 text-sm text-red-400 text-center">ACTION REQUIRED: Deploy 5 additional CLARA units to manage PM2.5 levels.</p>
+            </div>
+        </section>
+
+        <section id="login" class="hidden">
+            <div class="cyber-card p-6 md:p-8 rounded-xl max-w-sm mx-auto">
+                <h2 class="text-2xl font-semibold text-green-400 mb-6 text-center">ACCESS TERMINAL</h2>
+                <input id="nick" type="text" placeholder="User ID / Nickname" class="cyber-input w-full p-3 rounded mb-4" required>
+                <input id="pass" type="password" placeholder="Secure Key (Password)" class="cyber-input w-full p-3 rounded mb-6" required>
+                <div class="flex justify-between space-x-4" id="login-signup-btns">
+                    <button onclick="signUp()" class="cyber-btn w-1/2 py-3 rounded-lg font-bold">CREATE <i class="fas fa-user-plus"></i></button>
+                    <button onclick="login()" class="cyber-btn w-1/2 py-3 rounded-lg font-bold">LOGIN <i class="fas fa-sign-in-alt"></i></button>
+                </div>
+                <button id="logoutBtn" onclick="logout()" class="cyber-btn w-full py-3 rounded-lg font-bold mt-4 bg-red-600/80 hover:bg-red-700/80" style="display:none;">LOGOUT <i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </section>
+
+        <section id="profile" class="hidden">
+            <div class="cyber-card p-6 md:p-8 rounded-xl max-w-2xl mx-auto text-center">
+                <h2 class="text-3xl font-bold text-green-400 mb-6">User Profile <i class="fas fa-user-cog"></i></h2>
+                <div id="profile-content">
+                    <div class="text-center space-y-4">
+                        <div class="profile-pic-lg mx-auto mb-4" id="profile-picture">👤</div>
+                        <h3 class="text-3xl font-extrabold text-white" id="profile-name">Guest User</h3>
+                        <p class="tech-mono text-xl text-green-400" id="profile-rank">Eco Rookie</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 pt-6 border-t border-gray-700">
+                            <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-yellow-500">
+                                <p class="text-sm text-gray-400">Total Points</p>
+                                <p class="tech-mono text-2xl font-bold" id="profile-points">0</p>
+                            </div>
+                            <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-cyan-500">
+                                <p class="text-sm text-gray-400">Missions Contributed</p>
+                                <p class="tech-mono text-2xl font-bold" id="profile-missions">0</p>
+                            </div>
+                        </div>
+                        
+                        <div id="profile-pic-selector" class="mt-8 pt-4 border-t border-gray-700">
+                            <h4 class="text-xl font-bold text-cyan-400 mb-3">Choose Eco-Avatar</h4>
+                            <div id="avatar-options" class="flex justify-center flex-wrap gap-4">
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="leaderboard" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <div class="cyber-card p-6 md:p-8 rounded-xl lg:col-span-2">
+                    <h2 class="text-3xl font-bold text-green-400 mb-6">CLARA Elite Ranks <i class="fas fa-trophy"></i></h2>
+                    <div id="board" class="space-y-3"></div>
+                </div>
+                <div id="rewards" class="cyber-card p-6 md:p-8 rounded-xl lg:col-span-1">
+                    <h2 class="text-3xl font-bold text-green-400 mb-6">Point Exchange <i class="fas fa-gift"></i></h2>
+                    <p class="text-gray-400 mb-6">Redeem your points for exclusive eco-rewards.</p>
+                    <div class="space-y-4">
+                        <button onclick="redeem('Small Snack', 25)" class="cyber-btn w-full py-2 rounded-lg text-sm">Small Snack <span class="tech-mono text-white/80 float-right">25 pts</span></button>
+                        <button onclick="redeem('Eco-Pen', 40)" class="cyber-btn w-full py-2 rounded-lg text-sm">Eco-Friendly Pen <span class="tech-mono text-white/80 float-right">40 pts</span></button>
+                        <button onclick="redeem('Recycled Notebook', 60)" class="cyber-btn w-full py-2 rounded-lg text-sm">Recycled Notebook <span class="tech-mono text-white/80 float-right">60 pts</span></button>
+                        <button onclick="redeem('CLARA T-Shirt', 150)" class="cyber-btn w-full py-2 rounded-lg text-sm">CLARA T-Shirt <span class="tech-mono text-white/80 float-right">150 pts</span></button>
+                    </div>
+                    <p id="rewardMsg" class="tech-mono mt-4 text-sm text-center h-4"></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="daily-challenges" class="hidden max-w-6xl mx-auto mt-8">
+            <div class="cyber-card p-6 md:p-8 rounded-xl">
+                <h2 class="text-3xl font-bold text-yellow-400 mb-6">Daily Eco Challenges <i class="fas fa-check-circle"></i></h2>
+                <p id="challenge-date" class="text-sm text-gray-400 mb-4"></p>
+                <div id="challenges-list" class="space-y-4">
+                    </div>
+                <p class="tech-mono text-sm text-center mt-6 text-yellow-400">Complete challenges to earn up to 3 points each (max 9 total daily)!</p>
+            </div>
+        </section>
+        <section id="map" class="hidden">
+            <div class="cyber-card p-6 md:p-8 rounded-xl max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-green-400 mb-6">Pollution Heat Map <i class="fas fa-map-marked-alt"></i></h2>
+                <p class="text-gray-300 mb-8">Real-time air quality metrics guide CLARA units to high-impact zones.</p>
+                <div id="mapCanvas" class="flex flex-wrap justify-center gap-6"></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 mt-6 border-t border-gray-700">
+                    <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-green-500">
+                        <p class="text-sm text-gray-400">CLARA has recycled</p>
+                        <p class="tech-mono text-2xl font-bold">2,450 kg Plastic</p>
+                    </div>
+                    <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-orange-500">
+                        <p class="text-sm text-gray-400">CLARA has disposed of</p>
+                        <p class="tech-mono text-2xl font-bold">1,890 kg Biowaste</p>
+                    </div>
+                    <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-yellow-500">
+                        <p class="text-sm text-gray-400">CLARA has disposed of</p>
+                        <p class="tech-mono text-2xl font-bold">1,200 kg Metal</p>
+                    </div>
+                </div>
+                <p class="tech-mono mt-8 text-sm text-center text-red-400">ALERT: Drone & Dustbin currently prioritizing high CO₂/CO events.</p>
+            </div>
+        </section>
+
+        <section id="chat" class="hidden">
+            <div class="cyber-card p-6 md:p-8 rounded-xl max-w-xl mx-auto">
+                <h2 class="text-3xl font-bold text-green-400 mb-6">Community Hub <i class="fas fa-comments"></i></h2>
+                <div id="chatBox" class="h-64 overflow-y-auto bg-gray-900/50 p-4 rounded-lg border border-gray-700 mb-4 space-y-2"></div>
+                <input id="chatMsg" placeholder="Send a message..." class="cyber-input w-full p-3 rounded mb-4" required>
+                <button onclick="sendChat()" class="cyber-btn w-full py-3 rounded-lg font-bold">SEND TRANSMISSION</button>
+            </div>
+            
+            <div class="cyber-card p-6 md:p-8 rounded-xl max-w-xl mx-auto mt-8">
+                <h2 class="text-3xl font-bold text-cyan-400 mb-6">CLARA Community Calendar <i class="fas fa-calendar-alt"></i></h2>
+                <div id="calendar-events" class="space-y-4">
+                    <div class="bg-blue-900/20 p-3 rounded-lg border-l-4 border-cyan-500">
+                        <p class="font-bold text-white">CLARA community gathering</p>
+                        <p class="text-sm text-gray-400">📍 Lulu mall, 4:00 PM on 3rd December, 2025</p>
+                    </div>
+                    <div class="bg-blue-900/20 p-3 rounded-lg border-l-4 border-green-500">
+                        <p class="font-bold text-white">Eco-AI workshop (Indoor)</p>
+                        <p class="text-sm text-gray-400">📍 Technopark Phase 3 Auditorium, 10:00 AM on 10th December, 2025</p>
+                    </div>
+                    <div class="bg-blue-900/20 p-3 rounded-lg border-l-4 border-yellow-500">
+                        <p class="font-bold text-white">Waste Sorting Challenge Finals (Indoor)</p>
+                        <p class="text-sm text-gray-400">📍 Mascot Hotel Convention Hall, 2:00 PM on 17th December, 2025</p>
+                    </div>
+                </div>
+                <p class="tech-mono text-sm text-center mt-6 text-cyan-400">All locations are confirmed as indoor venues.</p>
+            </div>
+        </section>
+
+        <section id="ecoAI" class="hidden">
+            <div class="cyber-card p-6 md:p-8 rounded-xl max-w-xl mx-auto">
+                <h2 class="text-3xl font-bold text-green-400 mb-2">CLARA AI Console <i class="fas fa-brain"></i></h2>
+                <p class="text-gray-400 mb-6 text-sm">Neural Network Online. Ask about recycling, CLARA protocols, or pollution.</p>
+                <div class="relative group">
+                    <input id="aiQ" placeholder="Ex: How do I recycle batteries?" class="cyber-input w-full p-3 rounded-lg mb-4 pl-10 transition-all focus:ring-2 focus:ring-green-500" onkeydown="if(event.key==='Enter') askAI()">
+                    <i class="fas fa-search absolute left-3 top-3.5 text-gray-500 group-hover:text-green-400 transition-colors"></i>
+                </div>
+                <div id="aiA" class="bg-blue-900/20 p-4 rounded-lg border border-blue-400/50 min-h-[80px] text-white">
+                    System Ready. Awaiting input...
+                </div>
+                
+                <div class="mt-6 pt-4 border-t border-gray-700">
+                    <h4 class="text-xl font-bold text-green-400 mb-3">Daily Eco Tip</h4>
+                    <p id="dailyTipText" class="text-gray-300 italic text-sm">Loading tip...</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="settings" class="hidden">
+            <div class="cyber-card p-6 md:p-8 rounded-xl max-w-lg mx-auto">
+                <h2 class="text-3xl font-bold text-green-400 mb-6">System Settings <i class="fas fa-cog"></i></h2>
+                
+                <div class="space-y-4">
+                    <div class="p-4 bg-gray-800/50 rounded-lg border-l-4 border-cyan-500">
+                        <p class="text-lg font-semibold text-white mb-2">User: <span id="settingsUsername" class="tech-mono text-cyan-400">Guest</span></p>
+                        <p id="currentThemeText" class="text-sm text-gray-400 mb-3">Current: <span class="text-green-400 font-bold">Cyber-Dark Mode</span></p>
+                        <button id="themeToggle" onclick="toggleTheme()" class="cyber-btn py-2 px-4 rounded-full text-sm">SWITCH TO LIGHT</button>
+                    </div>
+
+                    <div class="p-4 bg-gray-800/50 rounded-lg border-l-4 border-green-500">
+                        <p class="text-lg font-semibold text-white mb-2">Background Music (Lofi Synth)</p>
+                        <p class="text-sm text-gray-400 mb-3">A subtle, ambient track to accompany your CLARA experience.</p>
+                        <button id="musicBtn" onclick="toggleMusic()" class="cyber-btn py-2 px-4 rounded-full text-sm">Toggle Music</button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="games" class="hidden">
+            <div class="cyber-card p-6 md:p-8 rounded-xl max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl font-bold text-green-400 mb-6">Eco-Tech Games <i class="fas fa-gamepad"></i></h2>
+                <p class="text-gray-300 mb-6">Earn points while improving your environmental awareness!</p>
+                <div class="flex flex-wrap justify-center space-x-4 mb-8">
+                    <button onclick="playQuiz()" class="cyber-btn py-3 px-6 rounded-lg font-bold text-lg mb-2">ECO QUIZ</button>
+                    <button onclick="playFlappy()" class="cyber-btn py-3 px-6 rounded-lg font-bold text-lg mb-2">FLAPPY BOT</button>
+                    <button onclick="playRecyclingGame()" class="cyber-btn py-3 px-6 rounded-lg font-bold text-lg mb-2">RECYCLING SORTER</button>
+                </div>
+                <div id="gameArea" class="mt-4 flex justify-center">
+                    <p class="text-gray-500">Select a game above to begin.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script>
+        // --- Global State ---
+        let currentUser=null; 
+        // FIX: Updating initial users with new ranks to fit the 50pt/level system
+        let users=[
+            {name:"Adwaid",points:160,rank:"ECO ROOKIE 4", avatar:"🌍"}, // 160 pts (150-199)
+            {name:"Niranjan",points:70,rank:"ECO ROOKIE 2", avatar:"🌱"}, // 70 pts (50-99)
+            {name:"Goutham",points:40,rank:"ECO ROOKIE 1", avatar:"🤖"}, // 40 pts (0-49)
+            {name:"EcoLegend33",points:4,rank:"ECO ROOKIE 1", avatar:"♻️"} // 4 pts (0-49)
+        ]; 
+        let chatLog=JSON.parse(localStorage.getItem('chatLog')||"[]");
+        let musicPreference = JSON.parse(localStorage.getItem('claraMusicPref') || 'false');
+        let currentTheme = localStorage.getItem('claraTheme') || 'dark';
+
+        // Flappy state
+        let flappyGameLoop = null; 
+        let botY = 0, gravity = 0.5, velocity = 0, isFlappyRunning = false, flappyScore = 0;
+        let flappyKeydownBound = false;
+
+        // Music state
+        let audioCtx = null, musicGain = null, musicInterval = null, musicPlaying = false;
+        let lofiFilter = null;
+        const chordProgression = [
+            [220, 277.18, 329.63], // Am (A3, C4, E4)
+            [293.66, 369.99, 440],  // Dm (D4, F4, A4)
+            [246.94, 311.13, 369.99], // G (B3, D#4, F#4 - simplified to D4, F4)
+            [261.63, 329.63, 392],  // C (C4, E4, G4)
+        ];
+        let chordIndex = 0;
+
+        // Recycling Game state
+        let canvas=null, ctx=null, recyclingGameLoop=null, isRecyclingRunning=false;
+        let recyclingScore=0, recyclingLives=5;
+        const itemSize = 32, itemFallSpeed = 1.5;
+        let items = [];
+        let bins = [];
+
+        // Quiz game state (UNCHANGED)
+        const quizQuestions = [
+            { question: "What percentage of plastic ever produced has been recycled?", a: ["~9%", "~30%", "~50%"], correct: 0, points: 2 },
+            { question: "What is the primary way CLARA detects pollution?", a: ["Lidar", "AI-powered Drones", "Ground Sensors"], correct: 1, points: 3 },
+            { question: "Which is the biggest consumer of household energy?", a: ["HVAC Unit", "Devices with 'phantom load' (TV, chargers)", "Refrigerator"], correct: 0, points: 2 }
+        ];
+        let currentQuizQuestionIndex = 0, quizTotalScore = 0;
+
+        // NEW: Avatar Emojis (Added more eco profiles - Request 3)
+        const ecoAvatars = ["🌍", "🌱", "💧", "♻️", "☀️", "🤖", "🌿", "🌬️", "🦋", "🌲", "🦊", "🌊", "🌋", "🍄", "🌎", "🌪️", "🌕", "🐼", "🦔", "🐒", "🦎", "🐞"];
+
+        // --- Theme Logic ---
+        function applyTheme(theme) {
+            const body = document.body;
+            const toggleBtn = document.getElementById('themeToggle');
+            const themeText = document.getElementById('currentThemeText');
+            currentTheme = theme;
+            localStorage.setItem('claraTheme', theme);
+            if (theme === 'light') {
+                body.classList.add('light-mode');
+                if (toggleBtn) toggleBtn.innerText = 'SWITCH TO DARK';
+                if (themeText) themeText.innerHTML = 'Current: <span class="text-blue-600 font-bold">Light Mode</span>';
+            } else {
+                body.classList.remove('light-mode');
+                if (toggleBtn) toggleBtn.innerText = 'SWITCH TO LIGHT';
+                if (themeText) themeText.innerHTML = 'Current: <span class="text-green-400 font-bold">Cyber-Dark Mode</span>';
+            }
+        }
+
+        function toggleTheme() {
+            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        }
+
+        // --- Core UI helpers ---
+        function show(id){
+            document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.remove('hidden');
+                el.classList.add('active');
+            }
+            // stop games when switching
+            stopFlappy();
+            stopRecyclingGame();
+            // nav active
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-nav'));
+            const navButton = document.getElementById(`nav-${id}`);
+            if (navButton) navButton.classList.add('active-nav');
+            
+            if (id === 'leaderboard') {
+                renderBoard();
+                // NEW: Show and render daily challenges when on leaderboard (Request 2)
+                const challengesSection = document.getElementById('daily-challenges');
+                if (challengesSection) {
+                    challengesSection.classList.remove('hidden');
+                    renderDailyChallenges();
+                }
+            } else {
+                 // NEW: Hide daily challenges when not on leaderboard page
+                const challengesSection = document.getElementById('daily-challenges');
+                if (challengesSection) {
+                    challengesSection.classList.add('hidden');
+                }
+            }
+
+            if (id === 'login') renderAuthButtons(); // ADDED: Handle Auth visibility
+            if (id === 'chat') renderChat();
+            if (id === 'settings') updateSettings();
+            if (id === 'ecoAI') {
+                if(!document.getElementById('aiA').innerText.includes('System Ready')) {
+                     document.getElementById('aiA').innerText = 'System Ready. Awaiting input...';
+                }
+                renderDailyTip();
+            }
+            if (id === 'map') renderMap();
+            // NEW: Profile rendering
+            if (id === 'profile') renderProfile();
+        }
+
+        // NEW/FIXED getRank function for Ranks 1-5, 50 points per level
+        function getRank(p){
+            const tierPoints = 50;
+            const tiers = [
+                "ECO ROOKIE", "ECO VETERAN", "ECO MASTER", "ECO GRANDMASTER", "ECO LEGEND"
+            ];
+            const totalTiers = tiers.length;
+            const maxLevelIndex = totalTiers * 5 - 1; // 24 levels total
+
+            // If points are negative or 0, start at Rookie 1
+            if (p <= 0) {
+                return { 
+                    rankName: `${tiers[0]} 1`, 
+                    points: p,
+                    pointsInLevel: 0,
+                    levelStart: 0,
+                    nextLevelPoints: tierPoints
+                };
+            }
+
+            // Calculate total levels passed (0-24)
+            let totalLevelIndex = Math.floor(p / tierPoints); 
+            
+            // Cap at the highest rank (Legend 5)
+            if (totalLevelIndex >= maxLevelIndex) {
+                return { 
+                    rankName: `${tiers[totalTiers-1]} 5`, 
+                    points: p,
+                    pointsInLevel: tierPoints, // Effectively maxed out for display
+                    levelStart: maxLevelIndex * tierPoints,
+                    nextLevelPoints: 0 // No more points needed
+                };
+            }
+            
+            // Determine the tier index (0-4) and level (1-5)
+            const tierIndex = Math.floor(totalLevelIndex / 5);
+            const level = (totalLevelIndex % 5) + 1;
+            const rankName = `${tiers[tierIndex]} ${level}`;
+            const levelStartPoints = totalLevelIndex * tierPoints;
+            const pointsInLevel = p - levelStartPoints;
+            const pointsNeeded = tierPoints - pointsInLevel;
+
+            return { 
+                rankName: rankName, 
+                points: p,
+                pointsInLevel: pointsInLevel,
+                levelStart: levelStartPoints,
+                nextLevelPoints: pointsNeeded
+            };
+        }
+        
+        // NEW: Function to handle Login/Logout button visibility (Request 1)
+        function renderAuthButtons() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            const loginSignUpDiv = document.getElementById('login-signup-btns');
+            
+            // Re-load user data if available
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                currentUser = JSON.parse(storedUser);
+            } else {
+                currentUser = null;
+            }
+
+            if (currentUser) {
+                if (logoutBtn) logoutBtn.style.display = 'block';
+                if (loginSignUpDiv) loginSignUpDiv.style.display = 'none';
+                // Pre-fill fields for a logged-in user
+                if(document.getElementById('nick')) document.getElementById('nick').value = currentUser.name;
+                if(document.getElementById('pass')) document.getElementById('pass').value = '********';
+            } else {
+                if (logoutBtn) logoutBtn.style.display = 'none';
+                if (loginSignUpDiv) loginSignUpDiv.style.display = 'flex';
+                if(document.getElementById('nick')) document.getElementById('nick').value = '';
+                if(document.getElementById('pass')) document.getElementById('pass').value = '';
+            }
+        }
+
+        // NEW: Logout Function (Request 1)
+        function logout(){
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            show('login');
+            renderAuthButtons(); 
+        }
+
+        // --- Authentication (FIXED: Removed all alerts - Request 2) ---
+        function login(){
+            let nick = document.getElementById('nick').value;
+            let pass = document.getElementById('pass').value;
+            let user = users.find(u => u.name === nick && u.password === pass);
+            if (user) {
+                currentUser = user;
+                // FIX: Update rank using new object return
+                currentUser.rank = getRank(currentUser.points).rankName;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                show('profile');
+                renderBoard();
+            } else {
+                // Removed alert: ACCESS DENIED
+                console.error("Login failed: Invalid User ID or Secure Key."); 
+            }
+            renderAuthButtons();
+        }
+        
+        function signUp(){
+            let nick = document.getElementById('nick').value;
+            let pass = document.getElementById('pass').value;
+            if (users.find(u => u.name === nick)) {
+                // Removed alert: User ID already exists
+                console.error("Sign Up failed: User ID already exists.");
+                return;
+            }
+            if (!nick || !pass) {
+                 // Removed alert: User ID and Secure Key required
+                 console.error("Sign Up failed: User ID and Secure Key required.");
+                 return;
+            }
+
+            currentUser = {name:nick, points:0, rank: "ECO ROOKIE 1", password: pass, avatar: "👤"};
+            users.push(currentUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            show('profile');
+            renderBoard();
+            // Removed alert: New user created
+            renderAuthButtons();
+        }
+
+        function setAvatar(avatar) {
+            if (!currentUser) return;
+            currentUser.avatar = avatar;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            renderProfile();
+        }
+
+        // --- Profile Section Logic (FIXED: Added Rank Progress Bar) ---
+        function renderProfile(){
+            const profileContentDiv = document.getElementById('profile-content');
+            
+            // Load user data if logged in
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                currentUser = JSON.parse(storedUser);
+            } else {
+                currentUser = null;
+            }
+
+            if(!currentUser){
+                profileContentDiv.innerHTML = `
+                    <p class="text-xl text-red-400">ACCESS DENIED: Please login or sign up on the Auth tab.</p>
+                `;
+            } else {
+                // NEW RANKING SYSTEM LOGIC
+                const rankData = getRank(currentUser.points);
+                // Calculate progress within the current 50-point level
+                const progressPercent = Math.min(100, (rankData.pointsInLevel / 50) * 100);
+                const nextRankText = rankData.nextLevelPoints === 0 
+                    ? "MAX RANK ACHIEVED" 
+                    : `${rankData.nextLevelPoints} pts to ${getRank(currentUser.points + rankData.nextLevelPoints).rankName}`;
+
+                // Ensure the rank property is the string for display/leaderboard sorting
+                currentUser.rank = rankData.rankName; 
+                
+                const missions = localStorage.getItem('claraMissions') || 0;
+                
+                profileContentDiv.innerHTML = `
+                    <div class="text-center space-y-4">
+                        <div class="profile-pic-lg mx-auto mb-4" id="profile-picture">${currentUser.avatar}</div>
+                        <h3 class="text-3xl font-extrabold text-white" id="profile-name">${currentUser.name}</h3>
+                        
+                        <p class="tech-mono text-xl text-green-400 mb-2" id="profile-rank">${rankData.rankName}</p>
+                        <div class="w-full max-w-xs mx-auto bg-gray-700 rounded-full h-3 mb-4 border border-gray-600 shadow-inner">
+                            <div class="bg-green-500 h-3 rounded-full transition-all duration-500" style="width: ${progressPercent}%"></div>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-4">${nextRankText}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 pt-6 border-t border-gray-700">
+                            <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-yellow-500">
+                                <p class="text-sm text-gray-400">Total Points</p>
+                                <p class="tech-mono text-2xl font-bold" id="profile-points">${currentUser.points}</p>
+                            </div>
+                            <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-cyan-500">
+                                <p class="text-sm text-gray-400">Missions Contributed</p>
+                                <p class="tech-mono text-2xl font-bold" id="profile-missions">${missions}</p>
+                            </div>
+                        </div>
+                        
+                        <div id="profile-pic-selector" class="mt-8 pt-4 border-t border-gray-700">
+                            <h4 class="text-xl font-bold text-cyan-400 mb-3">Choose Eco-Avatar</h4>
+                            <div id="avatar-options" class="flex justify-center flex-wrap gap-4">
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Render avatar options
+                const avatarOptionsDiv = document.getElementById('avatar-options');
+                if (avatarOptionsDiv) {
+                    avatarOptionsDiv.innerHTML = ecoAvatars.map(avatar => `
+                        <span class="profile-pic-sm ${avatar === currentUser.avatar ? 'selected' : ''}" data-avatar="${avatar}" onclick="setAvatar('${avatar}')" title="${avatar}" >${avatar}</span>
+                    `).join('');
+                }
+            }
+        }
+        // --- END Profile Section Logic ---
+        
+        // --- Settings Update ---
+        function updateSettings() {
+            const user = currentUser ? currentUser.name : "Guest";
+            const el = document.getElementById('settingsUsername');
+            if(el) el.innerText = user;
+
+            // Update theme display on settings page load
+            const themeText = document.getElementById('currentThemeText');
+            const toggleBtn = document.getElementById('themeToggle');
+            if (currentTheme === 'light') {
+                if (toggleBtn) toggleBtn.innerText = 'SWITCH TO DARK';
+                if (themeText) themeText.innerHTML = 'Current: <span class="text-blue-600 font-bold">Light Mode</span>';
+            } else {
+                if (toggleBtn) toggleBtn.innerText = 'SWITCH TO LIGHT';
+                if (themeText) themeText.innerHTML = 'Current: <span class="text-green-400 font-bold">Cyber-Dark Mode</span>';
+            }
+            
+            // Update music button state
+            const musicBtn = document.getElementById('musicBtn');
+            if (musicBtn) {
+                musicBtn.innerText = musicPreference ? 'Pause Music' : 'Play Music';
+            }
+        }
+
+        // --- Leaderboard/Points ---
+        function renderBoard(){
+            // Sort users by points descending
+            users.sort((a,b) => b.points - a.points);
+            
+            const board = document.getElementById('board');
+            if (!board) return;
+            
+            board.innerHTML = `
+                <div class="flex justify-between items-center p-3 font-bold text-lg bg-gray-700/80 rounded-t-lg border-b border-green-400">
+                    <span class="w-8">#</span>
+                    <span class="flex-1">User</span>
+                    <span class="hidden sm:inline w-28 text-right">Rank</span>
+                    <span class="w-24 text-right">Points</span>
+                </div>
+            ` + users.map((u, i) => {
+                const highlight = (currentUser && u.name === currentUser.name) ? 'bg-green-600/80' : (i%2 === 0 ? 'bg-gray-900/50' : 'bg-gray-800/50');
+                
+                // Ensure rank is updated before display, especially for older data
+                if(!u.rank.startsWith('ECO')) { 
+                    u.rank = getRank(u.points).rankName;
+                }
+
+                return `<div class="flex justify-between items-center p-3 ${highlight} rounded-lg mt-1 transition-colors">
+                    <span class="text-lg tech-mono w-8">#${i+1}</span>
+                    <span class="text-white flex-1 truncate">${u.name}</span>
+                    <span class="text-green-400 hidden sm:inline w-28 text-right">${u.rank}</span>
+                    <span class="tech-mono text-xl text-white/90 w-24 text-right">${u.points} pts</span>
+                </div>`;
+            }).join('');
+        }
+        
+        // FIX: Modified redeem to be less intrusive with messages (Request 2)
+        function redeem(item,cost){
+            const rewardMsgEl = document.getElementById('rewardMsg');
+            rewardMsgEl.innerText = ''; // Clear previous message
+            
+            if(!currentUser) { 
+                console.error("Redeem failed: Login required."); 
+                rewardMsgEl.innerText = "Login required.";
+                setTimeout(() => rewardMsgEl.innerText = '', 2000);
+                return; 
+            }
+            
+            if(currentUser.points<cost){
+                rewardMsgEl.innerText=`Insufficient points. Need ${cost} for ${item}.`;
+                setTimeout(() => rewardMsgEl.innerText = '', 2000);
+                return;
+            }
+            
+            currentUser.points -= cost;
+            // FIX: Update rank using new object return
+            currentUser.rank = getRank(currentUser.points).rankName; 
+            rewardMsgEl.innerText=`- ${cost} pts for ${item}`;
+            setTimeout(() => rewardMsgEl.innerText = '', 2000);
+
+            renderBoard();
+        }
+
+        // --- Simulations ---
+        function simulateDeposit(type){
+            if(!currentUser) { console.error("Login first!"); return; }
+            let add = {plastic:8,metal:14,bio:15}[type] || 0;
+            currentUser.points += add;
+            // FIX: Update rank using new object return
+            currentUser.rank = getRank(currentUser.points).rankName; 
+            localStorage.setItem('currentUser', JSON.stringify(currentUser)); // Save change
+            renderBoard();
+        }
+
+        // --- Chat ---
+        function sendChat(){
+            let msgInput=document.getElementById('chatMsg');
+            let msg=msgInput.value.trim();
+            if(!msg) return;
+            let name=currentUser?currentUser.name:"[GUEST]";
+            chatLog.push({name, message: msg, time: new Date().toLocaleTimeString()});
+            localStorage.setItem('chatLog', JSON.stringify(chatLog));
+            renderChat();
+            msgInput.value='';
+        }
+
+        function renderChat(){
+            let box=document.getElementById('chatBox');
+            box.innerHTML=chatLog.map(m=>{
+                const isUser = currentUser && m.name === currentUser.name;
+                const alignment = isUser ? 'text-right' : 'text-left';
+                // Using hardcoded classes here for light mode override compatibility
+                const color = isUser ? 'bg-green-600/80' : 'bg-gray-700/80';
+                return `
+                    <div class="${alignment}">
+                        <p class="text-xs text-gray-400">${m.name} <span class="text-green-400/80">${m.time}</span></p>
+                        <span class="inline-block p-2 rounded-lg ${color} text-sm">${m.message}</span>
+                    </div>
+                `;
+            }).join('');
+            box.scrollTop = box.scrollHeight; // Scroll to bottom
+        }
+
+        // --- Daily Eco Challenges (Request 2) ---
+
+        const allDailyChallenges = [
+            { id: 1, text: "Pick up 5 pieces of non-organic trash and dispose of them correctly.", points: 3 },
+            { id: 2, text: "Walk or cycle for at least 1 KM instead of using motorized transport.", points: 2 },
+            { id: 3, text: "Unplug three electronic devices that are currently idle (phantom power).", points: 2 },
+            { id: 4, text: "Use a reusable shopping bag for all purchases today.", points: 1 },
+            { id: 5, text: "Research one local recycling rule you didn't know before.", points: 1 },
+            { id: 6, text: "Reduce shower time by 2 minutes to conserve water.", points: 3 },
+            { id: 7, text: "Switch off all lights when leaving a room.", points: 2 },
+            { id: 8, text: "Eat a fully plant-based meal for dinner tonight.", points: 3 },
+        ];
+
+        function getDailyChallenges() {
+            // Uses the day of the year for a predictable daily refresh
+            const today = new Date();
+            const start = new Date(today.getFullYear(), 0, 0);
+            const diff = today - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+            
+            // Select 3 unique challenges based on the day (pseudo-random)
+            let selected = [];
+            const numChallenges = allDailyChallenges.length;
+            
+            for (let i = 0; i < 3; i++) {
+                const index = (dayOfYear + i) % numChallenges;
+                // Clone to ensure max points rule is applied
+                const challenge = {...allDailyChallenges[index]}; 
+                // Enforce maximum 3 points per challenge
+                challenge.points = Math.min(3, challenge.points);
+                selected.push(challenge);
+            }
+            
+            return selected;
+        }
+
+        function renderDailyChallenges() {
+            const challengeListEl = document.getElementById('challenges-list');
+            const challengeDateEl = document.getElementById('challenge-date');
+            if (!challengeListEl || !challengeDateEl) return;
+            
+            const today = new Date().toDateString();
+            challengeDateEl.innerText = `Challenges for: ${today}`;
+            
+            // --- Daily Refresh Logic ---
+            let completedChallenges = JSON.parse(localStorage.getItem('claraDailyCompleted') || '{}');
+            if (completedChallenges.date !== today) {
+                // Reset if the date does not match
+                completedChallenges = { date: today, completed: [] };
+                localStorage.setItem('claraDailyCompleted', JSON.stringify(completedChallenges));
+            }
+            const currentCompletedIds = completedChallenges.completed || [];
+            // --- End Daily Refresh Logic ---
+
+            const dailyChallenges = getDailyChallenges();
+
+            challengeListEl.innerHTML = dailyChallenges.map(c => {
+                const isCompleted = currentCompletedIds.includes(c.id);
+                const btnClass = isCompleted 
+                    ? 'bg-green-700/80 cursor-default' 
+                    : 'cyber-btn hover:bg-green-500/80';
+                const btnText = isCompleted ? 'COMPLETED <i class="fas fa-check"></i>' : `COMPLETE & EARN ${c.points} PTS`;
+                const onclick = isCompleted 
+                    ? '' 
+                    : `onclick="completeChallenge(${c.id}, ${c.points})"`;
+                    
+                return `
+                    <div class="bg-gray-800/50 p-4 rounded-lg border-l-4 border-yellow-500 flex justify-between items-center flex-wrap transition-colors duration-300">
+                        <p class="${isCompleted ? 'text-gray-500 line-through' : 'text-white'} font-medium flex-1 mr-4">${c.text}</p>
+                        <button class="py-2 px-4 rounded-lg text-sm font-bold mt-2 sm:mt-0 ${btnClass}" ${onclick} ${isCompleted ? 'disabled' : ''}>
+                            ${btnText}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // FIX: Modified completeChallenge to remove alerts (Request 2)
+        function completeChallenge(id, points) {
+            if (!currentUser) {
+                console.error("Challenge failed: User not logged in."); 
+                return;
+            }
+            
+            const today = new Date().toDateString();
+            let completedData = JSON.parse(localStorage.getItem('claraDailyCompleted') || '{}');
+            
+            if (completedData.date !== today) {
+                console.error("Challenge failed: Challenges refreshed.");
+                renderDailyChallenges();
+                return;
+            }
+
+            if (completedData.completed.includes(id)) {
+                return;
+            }
+
+            // Add points to user
+            currentUser.points += points;
+            // FIX: Update rank using new object return
+            currentUser.rank = getRank(currentUser.points).rankName; 
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Mark as completed
+            completedData.completed.push(id);
+            localStorage.setItem('claraDailyCompleted', JSON.stringify(completedData));
+            
+            // Re-render UI
+            renderDailyChallenges();
+            if(document.getElementById('profile').classList.contains('active')) renderProfile();
+            if(document.getElementById('leaderboard').classList.contains('active')) renderBoard();
+
+            // Removed alert: Challenge completed
+            console.log(`Challenge completed. +${points} points awarded. New rank: ${currentUser.rank}.`);
+        }
+        
+        // --- Eco AI Logic (FIXED: Added more knowledge for 'smarter' AI) ---
+        const aiKnowledgeBase = [
+            // General Info
+            { keywords: ["clara", "what is clara", "robot"], response: "CLARA stands for Cleaning Live Air Recycling Automation. It's a system of AI-powered drones and automated dustbins designed to detect and purify pollution hotspots." },
+            // Recycling & Waste
+            { keywords: ["plastic", "bottle"], response: "Plastics take up to 450 years to decompose. Rinse them before recycling! CLARA accepts PET (1) and HDPE (2) plastics." },
+            { keywords: ["battery", "batteries", "e-waste", "phone"], response: "NEVER throw batteries or electronics in regular bins. They leach toxic chemicals. Take them to designated e-waste centers or CLARA Red-Bins." },
+            { keywords: ["pizza", "box", "cardboard", "grease"], response: "Greasy pizza boxes cannot be recycled because the oil contaminates the paper pulp. Tear off the clean lid for recycling and compost the greasy bottom." },
+            { keywords: ["glass", "broken"], response: "Glass is 100% recyclable endlessly! However, broken glass is dangerous for sorters. Wrap broken glass in newspaper before disposing of it in general waste, not recycling." },
+            // General Eco Knowledge
+            { keywords: ["pollution", "smog"], response: "Pollution is the introduction of harmful materials. Air pollution causes 7 million premature deaths annually. CLARA targets Particulate Matter (PM2.5) specifically." },
+            { keywords: ["compost", "food", "organic"], response: "Composting turns organic waste into nutrient-rich soil. It reduces methane emissions from landfills. You can compost fruit peels, coffee grounds, and eggshells." },
+            { keywords: ["energy", "save", "electricity"], response: "Phantom energy (devices plugged in but off) accounts for 10% of home energy use. Unplug chargers and use power strips to cut the power completely." },
+            { keywords: ["water", "conserve"], response: "A dripping faucet can waste 3,000 gallons a year. Fix leaks and turn off the tap while brushing teeth to save ~200 gallons a month." },
+            { keywords: ["clothing", "fashion", "clothes"], response: "The fashion industry produces 10% of global carbon emissions. Buy less, buy second-hand, and donate old clothes instead of throwing them away." },
+            // NEW: AI Smarter Additions (Request 4)
+            { keywords: ["carbon", "footprint", "reduce", "emissions", "climate"], response: "Your carbon footprint is the total greenhouse gas emissions caused by your activities. To reduce it: eat less meat, fly less, switch to renewable energy sources, and consider driving an electric vehicle." },
+            { keywords: ["landfill", "trash", "garbage", "dump"], response: "Landfills are major sources of methane, a potent greenhouse gas. By actively recycling and composting, you can significantly reduce the volume of waste sent to landfills." },
+            { keywords: ["composting", "worms", "vermicompost", "fertilizer"], response: "Vermicomposting uses specialized worms to break down organic waste faster and produce nutrient-rich fertilizer (castings). It is a highly efficient and rewarding way to manage kitchen scraps." },
+        ];
+
+        const dailyTips = [
+            "Wash your clothes with cold water. Up to 90% of the energy used for washing goes to heating the water!",
+            "Stop pre-rinsing dishes before the dishwasher. Modern enzyme detergents work better on dirty dishes and you save water.",
+            "Bamboo is a sustainable alternative to wood. It grows back in 3-5 years compared to 30-50 years for trees.",
+            "Turn down your thermostat by 1°C. It can save up to 10% on your heating bill and reduce carbon usage.",
+            "Stop using plastic straws. Americans use 500 million straws every day. Use metal or paper alternatives.",
+            "Plant a bee-friendly garden. 1 in 3 bites of food we eat relies on pollination."
+        ];
+
+        function normalizeQuery(q){
+            return q.toLowerCase().trim().replace(/[^\w\s]/g,'');
+        }
+
+        async function askAI(){
+            let raw = document.getElementById('aiQ').value || '';
+            let q = normalizeQuery(raw);
+            let aiResponse = document.getElementById('aiA');
+
+            if(!q){
+                aiResponse.innerHTML = "Input required. Please state your query.";
+                return;
+            }
+
+            // Visual loading state
+            aiResponse.innerHTML = "<span class='animate-pulse text-green-500'>[ANALYZING DATABASE...]</span>";
+
+            setTimeout(() => {
+                let bestMatch = null;
+                let maxScore = 0;
+
+                aiKnowledgeBase.forEach(entry => {
+                    let score = 0;
+                    entry.keywords.forEach(word => {
+                        if (q.includes(word)) score++;
+                    });
+                    if (score > maxScore) {
+                        maxScore = score;
+                        bestMatch = entry;
+                    }
+                });
+
+                // Display result
+                if (bestMatch && maxScore > 0) {
+                    aiResponse.innerHTML = `<span class="text-white">${bestMatch.response}</span>`;
+                } else {
+                    aiResponse.innerHTML = "Query outside of parameters. Try asking about: 'recycling batteries', 'what is clara', 'saving energy', or 'carbon footprint'.";
+                }
+            }, 600);
+        }
+
+        function renderDailyTip() {
+            const today = new Date();
+            const start = new Date(today.getFullYear(), 0, 0);
+            const diff = today - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+            const tipIndex = dayOfYear % dailyTips.length;
+            const tipEl = document.getElementById('dailyTipText');
+            if(tipEl) {
+                tipEl.innerText = dailyTips[tipIndex];
+            }
+        }
+
+        // --- Map rendering (FIXED: Detailed Trivandrum sections) ---
+        function renderMap(){
+            const mapCanvas = document.getElementById('mapCanvas');
+            // Simplified grid layout for the map display
+            const mapSections = [
+                { location: "Pattom Junction", pollution: "High (PM2.5)", color: "bg-red-500" },
+                { location: "Technopark Phase I", pollution: "Low", color: "bg-green-500" },
+                { location: "Kowdiar Palace", pollution: "Moderate", color: "bg-yellow-500" },
+                { location: "Lulu Mall Area", pollution: "Moderate (CO₂)", color: "bg-orange-500" },
+                { location: "Airport Road", pollution: "High (NO₂)", color: "bg-red-700" },
+                { location: "Central Railway Stn", pollution: "High", color: "bg-red-500" },
+            ];
+            mapCanvas.innerHTML = mapSections.map(s => `
+                <div class="cyber-card p-4 rounded-xl text-center w-36 shadow-lg hover:shadow-green-500/50 transition-shadow">
+                    <p class="text-sm font-semibold text-white/90 mb-1">${s.location}</p>
+                    <div class="h-4 ${s.color} rounded-full"></div>
+                    <div class="text-xs font-semibold text-white/90">${s.pollution}</div>
+                </div> 
+            `).join('');
+        }
+        // --- END Map rendering FIX ---
+
+        // --- Music Helpers (MODIFIED: Lofi Implementation) ---
+        function initMusic(){
+            if (audioCtx) return;
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                musicGain = audioCtx.createGain();
+                musicGain.gain.value = 0.2; // Adjusted volume
+                
+                // NEW: Lofi Low-pass Filter
+                lofiFilter = audioCtx.createBiquadFilter();
+                lofiFilter.type = 'lowpass';
+                lofiFilter.frequency.value = 1000; // Muffled Lofi sound
+                lofiFilter.Q.value = 1;
+
+                // Connect Filter to Gain, and Gain to Destination
+                lofiFilter.connect(musicGain);
+                musicGain.connect(audioCtx.destination);
+                
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            } catch (e) {
+                audioCtx = null;
+            }
+        }
+
+        function playLofiChord(now) {
+            if (!audioCtx || !musicPlaying) return;
+
+            const chord = chordProgression[chordIndex % chordProgression.length];
+
+            chord.forEach((freq) => {
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                osc.type = 'square'; // Lofi-like wave
+                osc.frequency.setValueAtTime(freq, now); 
+
+                // Connect
+                osc.connect(g);
+                g.connect(lofiFilter); // Connect to the filter
+
+                // Volume envelope for decay (longer release for lofi)
+                g.gain.setValueAtTime(0.001, now);
+                g.gain.linearRampToValueAtTime(0.05, now + 0.1); // Attack
+                g.gain.linearRampToValueAtTime(0.02, now + 0.8); // Sustain level
+                g.gain.linearRampToValueAtTime(0.0001, now + 2.0); // Slow release (2 seconds)
+                
+                osc.start(now);
+                osc.stop(now + 2.5); // Chord lasts 2.5 seconds
+            });
+            chordIndex++;
+        }
+
+        function startMusic(){
+            if (!audioCtx) initMusic();
+            if (!audioCtx || musicPlaying) return;
+            
+            musicPlaying = true;
+            document.getElementById('musicToggle').classList.add('active');
+            musicInterval = setInterval(() => {
+                if(audioCtx) playLofiChord(audioCtx.currentTime);
+            }, 3000); // Play new chord every 3 seconds
+            
+            // Play first chord immediately
+            playLofiChord(audioCtx.currentTime);
+        }
+
+        function stopMusic(){
+            if(musicInterval) clearInterval(musicInterval);
+            musicPlaying = false;
+            document.getElementById('musicToggle').classList.remove('active');
+        }
+
+        function toggleMusic(){
+            musicPreference = !musicPreference;
+            localStorage.setItem('claraMusicPref', musicPreference);
+            if(musicPreference) {
+                startMusic();
+            } else {
+                stopMusic();
+            }
+            updateSettings(); // Update button text
+        }
+
+        // --- Games ---
+
+        // --- Flappy Bot Game ---
+        function playFlappy(){
+            stopRecyclingGame();
+            const g=document.getElementById('gameArea');
+            g.innerHTML = `
+                <div id="flappyGame" class="relative w-96 h-64 overflow-hidden border-2 border-green-400 rounded-lg shadow-2xl bg-blue-900/20">
+                    <div id="bot" class="absolute left-3 w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-xl shadow-lg border-2 border-white transition-all duration-100 ease-linear">🤖</div>
+                    <p id="flappyScore" class="absolute top-2 left-1/2 -translate-x-1/2 text-4xl font-bold tech-mono text-white/50 z-10">0</p>
+                    <div id="flappyMessage" class="hidden absolute inset-0 bg-gray-900/80 backdrop-blur-sm flex flex-col items-center justify-center text-center p-4">
+                        <button onclick="initializeFlappy()" class="cyber-btn py-3 px-6 rounded-lg font-bold text-lg mb-4">RE-DEPLOY BOT</button>
+                        <p class="text-sm text-gray-500">Click or SPACE to launch!</p>
+                    </div>
+                </div>`;
+            initializeFlappy();
+        }
+
+        function initializeFlappy(){
+            botY = 100;
+            gravity = 0.5;
+            velocity = 0;
+            flappyScore = 0;
+            isFlappyRunning = true;
+            document.getElementById('flappyScore').innerText = '0';
+            const bot = document.getElementById('bot');
+            if (bot) {
+                bot.style.top = botY + 'px';
+                bot.innerHTML = '🤖';
+                document.getElementById('flappyMessage').classList.add('hidden');
+            }
+
+            if (!flappyKeydownBound) {
+                document.addEventListener('keydown', handleFlappyInput);
+                flappyKeydownBound = true;
+            }
+
+            const fg = document.getElementById('flappyGame');
+            if (fg && !fg.dataset.clickBound) {
+                fg.addEventListener('click', handleFlappyInput);
+                fg.dataset.clickBound = 'true';
+            }
+            
+            document.querySelectorAll('.vine').forEach(v => v.remove());
+            flappyGameLoop = setInterval(updateFlappyGame, 20);
+            setTimeout(createVinePair, 1700);
+        }
+
+        function handleFlappyInput(e){
+            if (!isFlappyRunning) return;
+            if (e.type === 'keydown') {
+                if (e.code !== 'Space') return;
+                e.preventDefault();
+            }
+            velocity = -7;
+        }
+
+        function createVinePair(){
+            if (!isFlappyRunning) return;
+            const game = document.getElementById('flappyGame');
+            if (!game) return;
+
+            const gameHeight = 256;
+            const vineWidth = 48;
+            const gapSize = 100; // Size of the opening
+            const minGap = 30;
+            const maxGap = gameHeight - gapSize - minGap;
+            const gapPosition = Math.floor(Math.random() * (maxGap - minGap + 1)) + minGap;
+
+            const vineStyle = "absolute w-12 bg-green-700/80 border-2 border-green-400 shadow-xl";
+
+            const topVine = document.createElement('div');
+            topVine.classList.add('vine','topVine',...vineStyle.split(' '));
+            topVine.style.height = gapPosition + 'px';
+            topVine.style.top = '0';
+            topVine.style.right = -vineWidth + 'px';
+            topVine.scored = false;
+
+            const bottomVine = document.createElement('div');
+            bottomVine.classList.add('vine','bottomVine',...vineStyle.split(' '));
+            bottomVine.style.height = (gameHeight - gapPosition - gapSize) + 'px';
+            bottomVine.style.bottom = '0';
+            bottomVine.style.right = -vineWidth + 'px';
+            bottomVine.scored = false;
+
+            game.appendChild(topVine);
+            game.appendChild(bottomVine);
+            
+            setTimeout(createVinePair, 1700);
+        }
+
+        function updateFlappyGame(){
+            const game = document.getElementById('flappyGame');
+            if (!game) return;
+
+            const gameHeight = 256;
+            const gameWidth = game.offsetWidth;
+            const bot = document.getElementById('bot');
+            if (!bot) return;
+            const botSize = 32;
+
+            velocity += gravity;
+            botY += velocity;
+
+            if (botY > gameHeight - botSize || botY < 0) {
+                endFlappyGame();
+                return;
+            }
+
+            bot.style.top = botY + 'px';
+            const botX_left = 12;
+            const botX_right = botX_left + botSize;
+
+            document.querySelectorAll('.vine').forEach(vine => {
+                let currentRight = parseInt(String(vine.style.right || '0').replace('px','')) || 0;
+                currentRight += 2;
+                vine.style.right = currentRight + 'px';
+
+                const vineWidth = 48;
+                const vineX_left = gameWidth - currentRight - vineWidth;
+                const vineX_right = gameWidth - currentRight;
+
+                // Check for collision
+                const isHorizontalOverlap = botX_right > vineX_left && botX_left < vineX_right;
+
+                if (isHorizontalOverlap) {
+                    if (vine.classList.contains('topVine')) {
+                        const vineY_bottom = parseInt(vine.style.height.replace('px',''));
+                        if (botY < vineY_bottom) {
+                            endFlappyGame(); return;
+                        }
+                    } else if (vine.classList.contains('bottomVine')) {
+                        const vineY_top = gameHeight - parseInt(vine.style.height.replace('px',''));
+                        if (botY + botSize > vineY_top) {
+                            endFlappyGame(); return;
+                        }
+                    }
+                }
+
+                // Check for scoring
+                if (vine.classList.contains('topVine') && vineX_right < botX_left && !vine.scored) {
+                    flappyScore++;
+                    vine.scored = true;
+                    const scoreEl = document.getElementById('flappyScore');
+                    if (scoreEl) scoreEl.innerText = String(flappyScore);
+
+                    if (flappyScore % 5 === 0 && currentUser) {
+                        currentUser.points++;
+                        // FIX: Update rank using new object return
+                        currentUser.rank = getRank(currentUser.points).rankName;
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    }
+                }
+
+                // Clean up old vines
+                if (currentRight > gameWidth) vine.remove();
+            });
+        }
+
+        function endFlappyGame(){
+            stopFlappy();
+            const bot = document.getElementById('bot');
+            const message = document.getElementById('flappyMessage');
+            if (bot) bot.innerHTML = '💥';
+            if (message) { 
+                // Ensure text color is readable regardless of mode
+                const textColor = document.body.classList.contains('light-mode') ? 'text-black' : 'text-white';
+                message.classList.remove('hidden');
+                message.innerHTML = `<span class="${textColor}">GAME OVER.<br>Final Score: <span class="tech-mono text-3xl">${flappyScore}</span></span>
+                                     <button onclick="initializeFlappy()" class="cyber-btn py-3 px-6 rounded-lg font-bold text-lg mt-4">RE-DEPLOY BOT</button>`;
+            }
+        }
+
+        function stopFlappy(){
+            if (flappyGameLoop) {
+                clearInterval(flappyGameLoop);
+                flappyGameLoop = null;
+            }
+            if (flappyKeydownBound) {
+                document.removeEventListener('keydown', handleFlappyInput);
+                flappyKeydownBound = false;
+            }
+            const fg = document.getElementById('flappyGame');
+            if (fg && fg.dataset.clickBound) {
+                fg.removeEventListener('click', handleFlappyInput);
+                delete fg.dataset.clickBound;
+            }
+            isFlappyRunning = false;
+        }
+
+        // --- Quiz ---
+        function playQuiz(){
+            stopFlappy();
+            stopRecyclingGame();
+            currentQuizQuestionIndex=0;
+            quizTotalScore=0;
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion(){
+            const g=document.getElementById('gameArea');
+            if (currentQuizQuestionIndex >= quizQuestions.length) {
+                g.innerHTML = `
+                    <div class="p-8 bg-gray-800/50 rounded-xl w-full text-center max-w-lg">
+                        <h3 class="text-3xl font-bold text-green-400 mb-4">QUIZ COMPLETE!</h3>
+                        <p class="text-xl text-white mb-6">Your Total Score: <span class="tech-mono text-4xl">${quizTotalScore} pts</span></p>
+                        <button onclick="playQuiz()" class="cyber-btn py-3 px-6 rounded-lg font-bold">RETRY QUIZ</button>
+                    </div>
+                `;
+                if(currentUser && quizTotalScore > 0) updateQuizScore(quizTotalScore);
+                return;
+            }
+
+            const q = quizQuestions[currentQuizQuestionIndex];
+            g.innerHTML = `
+                <div class="p-6 bg-gray-800/50 rounded-xl w-full max-w-lg">
+                    <p class="text-sm text-gray-400 mb-2">Question ${currentQuizQuestionIndex + 1} of ${quizQuestions.length} | ${q.points} pts</p>
+                    <h4 class="text-xl font-bold text-white mb-6">${q.question}</h4>
+                    <div id="quiz-options" class="space-y-3">
+                        ${q.a.map((ans, i) => `
+                            <button onclick="checkQuizAnswer(${i})" class="cyber-btn w-full py-3 rounded-lg text-lg text-left px-4">
+                                <span class="font-bold mr-2">${String.fromCharCode(65 + i)}:</span> ${ans}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <p id="quiz-feedback" class="mt-4 text-center font-bold"></p>
+                </div>
+            `;
+        }
+
+        function checkQuizAnswer(selected) {
+            const q = quizQuestions[currentQuizQuestionIndex];
+            const feedback = document.getElementById('quiz-feedback');
+            const options = document.getElementById('quiz-options');
+            
+            options.querySelectorAll('button').forEach((btn, i) => {
+                btn.onclick = null; // Disable further clicks
+                if (i === q.correct) {
+                    btn.classList.remove('cyber-btn');
+                    btn.classList.add('bg-green-700', 'hover:bg-green-700');
+                } else if (i === selected) {
+                    btn.classList.remove('cyber-btn');
+                    btn.classList.add('bg-red-700', 'hover:bg-red-700');
+                } else {
+                     btn.classList.remove('cyber-btn');
+                     btn.classList.add('bg-gray-600', 'hover:bg-gray-600');
+                }
+            });
+
+            if (selected === q.correct) {
+                quizTotalScore += q.points;
+                feedback.innerHTML = `<span class="text-green-400">CORRECT! +${q.points} Points.</span>`;
+            } else {
+                feedback.innerHTML = `<span class="text-red-400">INCORRECT. The correct answer was ${String.fromCharCode(65 + q.correct)}.</span>`;
+            }
+
+            currentQuizQuestionIndex++;
+            setTimeout(renderQuizQuestion, 1500);
+        }
+
+        function updateQuizScore(points) {
+            if(!currentUser) return;
+            let missions = parseInt(localStorage.getItem('claraMissions') || '0');
+            missions++;
+            localStorage.setItem('claraMissions', missions);
+            currentUser.points += points;
+            // FIX: Update rank using new object return
+            currentUser.rank = getRank(currentUser.points).rankName;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            renderBoard();
+        }
+
+        // --- Recycling Sorter Game ---
+        function playRecyclingGame(){
+            stopFlappy();
+            stopRecyclingGame();
+            const gameArea=document.getElementById('gameArea');
+            gameArea.innerHTML = `
+                <div class="w-full max-w-sm mx-auto">
+                    <canvas id="recyclingCanvas" width="384" height="400"></canvas>
+                    <div class="flex justify-between items-center mt-4">
+                        <p class="tech-mono text-lg text-green-400">SCORE: <span id="recyclingScoreDisplay" class="font-bold">0</span></p>
+                        <p class="tech-mono text-lg text-red-400">LIVES: <span id="recyclingLivesDisplay" class="font-bold">5</span></p>
+                    </div>
+                    <div class="mt-4 p-3 bg-gray-800/50 rounded-lg text-center">
+                        <p class="text-sm text-gray-400 mb-2">Click the falling waste item to send it to the bin of the same color!</p>
+                        <p class="text-xs text-green-400"><span class="font-bold">GREEN:</span> PLASTIC, <span class="font-bold">YELLOW:</span> METAL, <span class="font-bold">ORANGE:</span> BIOWASTE</p>
+                    </div>
+                </div>`;
+            canvas = document.getElementById('recyclingCanvas');
+            ctx = canvas.getContext('2d');
+            isRecyclingRunning=true;
+            recyclingScore=0;
+            recyclingLives=5;
+            items=[];
+            bins = [
+                { x:50,y:350,w:80,h:40,color:'#10b981',type:'plastic' }, // Green
+                { x:150,y:350,w:80,h:40,color:'#f59e0b',type:'metal' }, // Yellow/Orange
+                { x:250,y:350,w:80,h:40,color:'#f97316',type:'biowaste' } // Orange/Red
+            ];
+            canvas.addEventListener('click', handleRecyclingClick);
+            recyclingGameLoop = setInterval(updateRecyclingGame, 50);
+            spawnRecyclingItem();
+        }
+
+        function spawnRecyclingItem() {
+            if (!isRecyclingRunning) return;
+            const itemTypes = ['plastic', 'metal', 'biowaste'];
+            const type = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+            const colorMap = { 'plastic': '#10b981', 'metal': '#f59e0b', 'biowaste': '#f97316' };
+            
+            items.push({
+                x: Math.random() * (canvas.width - itemSize),
+                y: -itemSize,
+                type: type,
+                color: colorMap[type],
+                isFalling: true,
+                targetX: null,
+                targetY: null
+            });
+            setTimeout(spawnRecyclingItem, Math.random() * 1500 + 1000);
+        }
+
+        function drawRecycling(){
+            if (!ctx || !canvas) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw bins
+            bins.forEach(bin => {
+                ctx.fillStyle = bin.color;
+                ctx.fillRect(bin.x, bin.y, bin.w, bin.h);
+                // Draw bin outline/lip
+                ctx.strokeStyle = '#d1d5db';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(bin.x, bin.y, bin.w, bin.h);
+            });
+
+            // Draw items
+            items.forEach(item => {
+                ctx.fillStyle = item.color;
+                ctx.fillRect(item.x, item.y, itemSize, itemSize);
+                // Simple inner symbol for type
+                ctx.fillStyle = '#fff';
+                ctx.font = '20px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const symbolMap = { 'plastic': '♳', 'metal': '⚙️', 'biowaste': '🍎' };
+                ctx.fillText(symbolMap[item.type], item.x + itemSize/2, item.y + itemSize/2);
+            });
+        }
+
+        function updateRecyclingGame(){
+            if (!isRecyclingRunning || !canvas) return;
+            
+            items = items.filter(item => {
+                if (item.isFalling) {
+                    item.y += itemFallSpeed;
+                    if (item.y > canvas.height) {
+                        recyclingLives--;
+                        document.getElementById('recyclingLivesDisplay').innerText = String(recyclingLives);
+                        if (recyclingLives <= 0) {
+                            endRecyclingGame();
+                            return false;
+                        }
+                        return false; // Remove missed item
+                    }
+                } else {
+                    // Item is clicked and moving to a bin
+                    const targetBin = bins.find(b => b.type === item.type);
+                    if (!targetBin) return true; // Keep item if no bin found
+                    
+                    if (item.targetX === null) {
+                        // Set target to center of bin
+                        item.targetX = targetBin.x + targetBin.w/2 - itemSize/2;
+                        item.targetY = targetBin.y - itemSize; // Just above the bin
+                    }
+
+                    // Move item towards target
+                    const dx = item.targetX - item.x;
+                    const dy = item.targetY - item.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    const speed = 15;
+
+                    if (dist < speed) {
+                        // Arrived at bin
+                        recyclingScore += 5;
+                        document.getElementById('recyclingScoreDisplay').innerText = String(recyclingScore);
+
+                        if (recyclingScore % 50 === 0 && currentUser) {
+                            currentUser.points += 5;
+                            // FIX: Update rank using new object return
+                            currentUser.rank = getRank(currentUser.points).rankName;
+                            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                            renderBoard();
+                        }
+
+                        return false; // Remove item
+                    } else {
+                        item.x += dx / dist * speed;
+                        item.y += dy / dist * speed;
+                    }
+                }
+                return true;
+            });
+            drawRecycling();
+        }
+
+        function handleRecyclingClick(e){
+            if (!isRecyclingRunning || !canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            // Only transition the first clicked item to a bin
+            const clickedItem = items.find(item => item.isFalling && 
+                clickX >= item.x && clickX <= item.x + itemSize && 
+                clickY >= item.y && clickY <= item.y + itemSize);
+
+            if (clickedItem) {
+                clickedItem.isFalling = false;
+            }
+        }
+
+        function endRecyclingGame(){
+            stopRecyclingGame();
+            if (ctx && canvas){
+                const isLightMode = document.body.classList.contains('light-mode');
+                const overlayColor = isLightMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(3, 7, 18, 0.8)';
+                
+                ctx.fillStyle = overlayColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = isLightMode ? '#1f2937' : '#d1d5db';
+                ctx.font = '30px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2 - 30);
+                
+                ctx.fillStyle = '#34d399';
+                ctx.font = '40px Share Tech Mono, monospace';
+                ctx.fillText(`SCORE: ${recyclingScore}`, canvas.width/2, canvas.height/2 + 20);
+
+                if(currentUser){
+                    let points = Math.floor(recyclingScore / 10);
+                    let missions = parseInt(localStorage.getItem('claraMissions') || '0');
+                    missions++;
+                    localStorage.setItem('claraMissions', missions);
+
+                    currentUser.points += points;
+                    // FIX: Update rank using new object return
+                    currentUser.rank = getRank(currentUser.points).rankName;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.font = '20px Inter, sans-serif';
+                    ctx.fillText(`+${points} POINTS AWARDED`, canvas.width/2, canvas.height/2 + 60);
+                    renderBoard();
+                }
+
+                setTimeout(playRecyclingGame, 30000); // Allow retry after 30s
+            }
+        }
+
+        function stopRecyclingGame(){
+            if (recyclingGameLoop) {
+                clearInterval(recyclingGameLoop);
+                recyclingGameLoop = null;
+            }
+            if (canvas) {
+                canvas.removeEventListener('click', handleRecyclingClick);
+            }
+            isRecyclingRunning=false;
+            items=[];
+        }
+
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', ()=>{ 
+            // 1. Theme Initialization
+            applyTheme(currentTheme);
+
+            // 2. Initial UI setup
+            show('home'); 
+            updateSettings(); 
+            renderDailyChallenges(); // ADDED: Initialize daily challenges on load (Request 2)
+            
+            // 3. Trivandrum Initial Location Display (FIX 1)
+            const locationDisplay = "PATTOM JUNCTION";
+            const trivandrumEl = document.getElementById('trivandrumLocation');
+            if (trivandrumEl) { trivandrumEl.innerText = locationDisplay; }
+            
+            // 4. Music Initialization
+            window.addEventListener('click', initMusic, { once:true, passive:true }); 
+            if(musicPreference) { startMusic(); }
+            
+            // 5. Initialize default avatars if missing for existing users
+            users.forEach(u => {
+                if (u.avatar === undefined) u.avatar = '👤';
+            });
+            
+            // 6. Check Auth state on load
+            renderAuthButtons();
+        });
+        
+        document.addEventListener('visibilitychange', ()=>{ 
+            if (document.hidden && musicPlaying) stopMusic(); 
+            if (!document.hidden && musicPreference && !musicPlaying) {
+                // Only start if it was previously playing AND context is suspended/closed
+                if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); startMusic(); }
+            } 
+        }); 
+    </script>
+</body>
+</html>
