@@ -247,13 +247,18 @@
 </head>
 <body class="p-0 md:p-8">
 
-    <header class="text-center py-6 px-4 bg-gray-900 shadow-xl border-b border-gray-700 md:rounded-t-xl">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-wider drop-shadow-lg">
-            CLARA — Cleaning Live Air Recycling Automation 
-            <span class="text-green-400">🤖🌿</span>
-        </h1>
-        <p class="text-sm text-gray-400 mt-1">Merging Nature and Technology for a Cleaner Tomorrow</p>
-    </header>
+    <header class="text-center py-6 px-4 bg-gray-900 shadow-xl border-b border-gray-700 md:rounded-t-xl flex flex-col items-center">
+    
+    <!-- NEW LOGO -->
+    <img src="logo.png" alt="CLARA Logo" class="w-24 h-24 mb-3 rounded-full shadow-lg border border-green-400 object-contain">
+
+    <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-wider drop-shadow-lg">
+        CLARA — Cleaning Live Air Recycling Automation 
+        <span class="text-green-400">🤖🌿</span>
+    </h1>
+    <p class="text-sm text-gray-400 mt-1">Merging Nature and Technology for a Cleaner Tomorrow</p>
+</header>
+
 
     <button id="musicToggle" title="Toggle background music"><i class="fas fa-music"></i></button>
 
@@ -1754,11 +1759,8 @@
             if (!document.hidden && musicPreference && !musicPlaying) {
                 // Only start if it was previously playing AND context is suspended/closed
                 if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); startMusic(); }
-            }  
+            } 
         }); 
     </script>
 </body>
-
 </html>
-
-.
